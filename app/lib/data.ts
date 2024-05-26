@@ -19,7 +19,7 @@ export async function fetchRevenue() {
     // Don't do this in production :)
 
     // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     const data = await sql<Revenue>`SELECT * FROM revenue`;
 
@@ -227,5 +227,45 @@ export async function getUser(email: string) {
   } catch (error) {
     console.error('Failed to fetch user:', error);
     throw new Error('Failed to fetch user.');
+  }
+}
+
+export async function fetchTotalInvoices() {
+  try {
+    const count = await sql`SELECT COUNT(*) FROM invoices`;
+    return Number(count.rows[0].count);
+  } catch(error) {
+    console.error('Failed to fetch total number of invoices:', error);
+    throw new Error('Failed to fetch total number of invoices.');
+  }
+}
+
+export async function fetchTotalCustomers() {
+  try {
+    const count = await sql`SELECT COUNT(*) FROM customers`;
+    return Number(count.rows[0].count);
+  } catch(error) {
+    console.error('Failed to fetch total number of customers:', error);
+    throw new Error('Failed to fetch total number of customers.');
+  }
+}
+
+export async function fetchPaidInvoicesAmount() {
+  try {
+    const data = await sql`SELECT SUM(amount) FROM invoices WHERE status='paid'`;
+    return formatCurrency(data.rows[0].sum);
+  } catch(error) {
+    console.log('Failed to fetch paid invoices:', error);
+    throw new Error('Failed to fetch paid invoices.');
+  }
+}
+
+export async function fetchPendingInvoicesAmount() {
+  try {
+    const data = await sql`SELECT SUM(amount) FROM invoices WHERE status='pending'`;
+    return formatCurrency(data.rows[0].sum);
+  } catch(error) {
+    console.log('Failed to fetch pending invoices:', error);
+    throw new Error('Failed to fetch pending invoices.');
   }
 }
